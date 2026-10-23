@@ -117,7 +117,8 @@ html[data-theme="light"] .safety-card{background:#fffdf6;border-color:#d5c8b8;co
 html[data-theme="light"] .safety-photo:after{background:linear-gradient(0deg,#20323b75,transparent 75%)}
 html[data-theme="light"] .theme-toggle{background:#fffdf6;color:#20323b}
 @media(max-width:760px){.theme-toggle{margin-left:0}}
-</style></head><body>
+</style>  <script src="performance.js" defer></script>
+</head><body>
 <header class="top"><div class="brand"><div class="mark" aria-hidden="true">✦</div><div><h1>Sri Lanka and Canada Airtracker</h1><p>Aircraft exploration · Cabin Crew Simulator</p></div></div>
 <nav class="tabs" aria-label="Main sections"><button class="tab" id="mapTab" aria-selected="true">Aircraft Map</button><button class="tab" id="crewTab" aria-selected="false">Cabin Crew Simulator</button><button class="tab" id="safetyTab" aria-selected="false">Safety & Video Lab ✦</button><button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">☼ LIGHT MODE</button></nav></header>
 <main class="wrap"><section id="mapView"><p class="intro">Explore aircraft data for selected regions in Sri Lanka and Canada. Positions may be illustrative when live data is unavailable.</p><div class="panel"><div class="toolbar"><select id="region" aria-label="Tracking region"></select><select id="cat" aria-label="Aircraft category"><option value="all">All aircraft</option><option value="small">Small aircraft</option><option value="bizjet">Business jets</option><option value="other">Other aircraft</option></select><select id="airline" aria-label="Airline filter"><option value="">All airlines</option></select><span id="count" aria-live="polite">Loading aircraft…</span><div class="sub">Live data depends on API availability · Static demo uses sample aircraft · Routes illustrative</div></div><div id="map" role="application" aria-label="Interactive aircraft map"></div></div></section>
