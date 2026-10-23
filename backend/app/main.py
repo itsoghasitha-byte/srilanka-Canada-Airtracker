@@ -4,8 +4,8 @@ from fastapi.responses import FileResponse
 from . import core
 
 app = FastAPI(
-    title="Tracjer",
-    description="Aircraft exploration for Sri Lanka and Canada, plus interactive cabin-crew scenario practice.",
+    title="Sri Lanka and Canada Airtracker + Cabin Crew Simulator",
+    description="Explore aircraft across Sri Lanka and Canada and practise cabin-crew passenger-service scenarios.",
     version="1.1.0",
 )
 FRONTEND = Path(__file__).resolve().parents[2] / "frontend" / "index.html"
@@ -32,7 +32,7 @@ def get_corridors():
 
 @app.get("/health")
 def health():
-    return {"status": "ok", "app": "Tracjer"}
+    return {"status": "ok", "app": "Sri Lanka and Canada Airtracker + Cabin Crew Simulator"}
 
 @app.get("/")
 def index():
