@@ -3,7 +3,11 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 from . import core
 
-app = FastAPI(title="Sri Lanka & Canada Tracker")
+app = FastAPI(
+    title="Tracjer",
+    description="Aircraft exploration for Sri Lanka and Canada, plus interactive cabin-crew scenario practice.",
+    version="1.1.0",
+)
 FRONTEND = Path(__file__).resolve().parents[2] / "frontend" / "index.html"
 
 @app.get("/api/aircraft")
@@ -25,6 +29,10 @@ def get_airports():
 @app.get("/api/corridors")
 def get_corridors():
     return core.corridors()
+
+@app.get("/health")
+def health():
+    return {"status": "ok", "app": "Tracjer"}
 
 @app.get("/")
 def index():
