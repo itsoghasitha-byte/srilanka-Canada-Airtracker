@@ -88,9 +88,38 @@ body{background:radial-gradient(ellipse at 10% 0%,#153e5b 0,transparent 35%),rad
 .animated-photo,.media-fallback{display:none!important}
 .safety-photo img{animation:none!important;transform:none!important;filter:none!important}
 .media-card video{display:block;width:100%;aspect-ratio:16/9;object-fit:contain;background:#020617}
+
+/* AIRTRACKER THEME SYSTEM — midnight flight deck / cloud, teal and signal amber */
+:root{--bg:#101d2b;--panel:#1a2d3c;--line:#3a5664;--muted:#b5c6c8;--text:#f1f5ed;--accent:#e8ad67;--green:#8bc9b8;--air-coral:#df8275;--air-teal:#8bc9b8}
+body{background:radial-gradient(ellipse at 10% 0%,#1d4950 0,transparent 35%),radial-gradient(ellipse at 92% 8%,#56364d 0,transparent 32%),var(--bg);color:var(--text)}
+.top{background:linear-gradient(115deg,#183c48,#24263c);border-color:var(--line)}
+button,select{background:#203849;color:var(--text);border-color:#486573}
+.tab[aria-selected=true]{background:linear-gradient(110deg,#e8ad67,#df8275);color:#192330;border-color:transparent}
+.panel,.score{background:#1a2d3c;border-color:var(--line)}
+.story,.side-card li{color:#d6e1dd}
+.feedback{background:#1d3a37;border-color:#4b8478}.feedback h3{color:var(--green)}
+.theme-toggle{margin-left:auto;border:1px solid var(--line);border-radius:999px;padding:8px 12px;background:#203849;color:var(--text);font-weight:700;font-size:12px}
+.theme-toggle:hover{border-color:var(--accent)}
+html[data-theme="light"]{color-scheme:light;--bg:#f1f5ef;--panel:#fffdf6;--line:#cadbd5;--muted:#617579;--text:#20323b;--accent:#a75e35;--green:#287d70;--air-coral:#bb625d;--air-teal:#287d70}
+html[data-theme="light"] body{background:radial-gradient(ellipse at 10% 0%,#c4e0d7 0,transparent 36%),radial-gradient(ellipse at 92% 8%,#ead2d9 0,transparent 32%),var(--bg);color:var(--text)}
+html[data-theme="light"] .top{background:linear-gradient(115deg,#d7e9e1,#eee1e7);border-color:var(--line)}
+html[data-theme="light"] .brand p,html[data-theme="light"] .intro,html[data-theme="light"] .sub,html[data-theme="light"] #count,html[data-theme="light"] .disclaimer,html[data-theme="light"] .footer{color:var(--muted)}
+html[data-theme="light"] button,html[data-theme="light"] select{background:#fffdf6;color:#20323b;border-color:#b8ccc6}
+html[data-theme="light"] .tab[aria-selected=true]{background:linear-gradient(110deg,#e8ad67,#df8275);color:#20323b}
+html[data-theme="light"] .panel,html[data-theme="light"] .score{background:#fffdf6;border-color:var(--line)}
+html[data-theme="light"] .story,html[data-theme="light"] .side-card li{color:#3d565b}
+html[data-theme="light"] .choice{background:#e3eee9;color:#20323b;border-color:#c4d8d0}
+html[data-theme="light"] .choice span{color:#617579}
+html[data-theme="light"] .feedback{background:#e0f0e9;border-color:#a4cfc0}
+html[data-theme="light"] .lab-label{background:#fffdf0e8;color:#425b60;border-color:#d5c4a6}
+html[data-theme="light"] .lab-label b{color:#a75e35}
+html[data-theme="light"] .safety-card{background:#fffdf6;border-color:#d5c8b8;color:#20323b}
+html[data-theme="light"] .safety-photo:after{background:linear-gradient(0deg,#20323b75,transparent 75%)}
+html[data-theme="light"] .theme-toggle{background:#fffdf6;color:#20323b}
+@media(max-width:760px){.theme-toggle{margin-left:0}}
 </style></head><body>
 <header class="top"><div class="brand"><div class="mark" aria-hidden="true">✦</div><div><h1>Sri Lanka and Canada Airtracker</h1><p>Aircraft exploration · Cabin Crew Simulator</p></div></div>
-<nav class="tabs" aria-label="Main sections"><button class="tab" id="mapTab" aria-selected="true">Aircraft Map</button><button class="tab" id="crewTab" aria-selected="false">Cabin Crew Simulator</button><button class="tab" id="safetyTab" aria-selected="false">Safety & Video Lab ✦</button></nav></header>
+<nav class="tabs" aria-label="Main sections"><button class="tab" id="mapTab" aria-selected="true">Aircraft Map</button><button class="tab" id="crewTab" aria-selected="false">Cabin Crew Simulator</button><button class="tab" id="safetyTab" aria-selected="false">Safety & Video Lab ✦</button><button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">☼ LIGHT MODE</button></nav></header>
 <main class="wrap"><section id="mapView"><p class="intro">Explore aircraft data for selected regions in Sri Lanka and Canada. Positions may be illustrative when live data is unavailable.</p><div class="panel"><div class="toolbar"><select id="region" aria-label="Tracking region"></select><select id="cat" aria-label="Aircraft category"><option value="all">All aircraft</option><option value="small">Small aircraft</option><option value="bizjet">Business jets</option><option value="other">Other aircraft</option></select><select id="airline" aria-label="Airline filter"><option value="">All airlines</option></select><span id="count" aria-live="polite">Loading aircraft…</span><div class="sub">Live data depends on API availability · Static demo uses sample aircraft · Routes illustrative</div></div><div id="map" role="application" aria-label="Interactive aircraft map"></div></div></section>
 <section id="crewView" class="hidden"><p class="intro">Short, fictional passenger-service situations. Choose a response and review the reasoning behind the feedback.</p><div class="scenario-layout"><div class="panel scenario-card"><div class="eyebrow" id="scenarioCount">Scenario 1 of 3</div><h2 id="scenarioTitle"></h2><p class="story" id="scenarioStory"></p><div class="choices" id="choices"></div><div id="feedback" class="feedback hidden" aria-live="polite"></div><button id="nextScenario" class="secondary hidden">Next scenario →</button><button id="restart" class="secondary hidden">Try again from the start</button></div><aside class="panel side-card"><h3>What this practice covers</h3><ul><li>Empathy and respectful passenger care</li><li>Clear, calm communication</li><li>Safety awareness and following procedures</li><li>Knowing when to involve the appropriate crew member</li></ul><div class="scoregrid"><div class="score"><b id="totalScore">—</b><small>Practice points</small></div><div class="score"><b id="doneCount">0/3</b><small>Scenarios completed</small></div></div><p class="disclaimer">This is an independent learning demo, not an airline assessment, official training material, or a prediction of hiring outcomes. In real situations, follow the airline's procedures and crew instructions.</p></aside></div></section>
 <section id="safetyView" class="hidden">
@@ -132,6 +161,13 @@ body{background:radial-gradient(ellipse at 10% 0%,#153e5b 0,transparent 35%),rad
 </section>
 </main><footer class="footer">Sri Lanka and Canada Airtracker + Cabin Crew Simulator · Built with Python, FastAPI, JavaScript, Leaflet and an optional C++ distance module.</footer>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script>
+
+const themeToggle=document.getElementById("themeToggle");
+const savedAirTheme=localStorage.getItem("airtracker-theme");
+const preferAirLight=window.matchMedia&&window.matchMedia("(prefers-color-scheme: light)").matches;
+function setAirTheme(theme){document.documentElement.dataset.theme=theme;const light=theme==="light";themeToggle.textContent=light?"◐ DARK MODE":"☼ LIGHT MODE";themeToggle.setAttribute("aria-pressed",String(light));themeToggle.setAttribute("aria-label",light?"Switch to dark mode":"Switch to light mode");const meta=document.querySelector('meta[name="theme-color"]');if(meta)meta.content=light?"#f1f5ef":"#101d2b";}
+setAirTheme(savedAirTheme==="light"||savedAirTheme==="dark"?savedAirTheme:(preferAirLight?"light":"dark"));
+themeToggle.addEventListener("click",()=>{const next=document.documentElement.dataset.theme==="light"?"dark":"light";localStorage.setItem("airtracker-theme",next);setAirTheme(next)});
 const API=location.protocol==="file:"?"http://localhost:8000":"";const $=id=>document.getElementById(id);
 $("mapTab").addEventListener("click",()=>showView("map"));$("crewTab").addEventListener("click",()=>showView("crew"));$("safetyTab").addEventListener("click",()=>showView("safety"));
 function showView(which){const crew=which==="crew",safety=which==="safety";$("mapView").classList.toggle("hidden",crew||safety);$("crewView").classList.toggle("hidden",!crew);$("safetyView").classList.toggle("hidden",!safety);$("mapTab").setAttribute("aria-selected",String(!crew&&!safety));$("crewTab").setAttribute("aria-selected",String(crew));$("safetyTab").setAttribute("aria-selected",String(safety));if(!crew&&!safety)setTimeout(()=>map.invalidateSize(),50)}
