@@ -1,41 +1,58 @@
-# Sri Lanka & Canada Tracker
+# Tracjer
 
-Sri Lanka & Canada Tracker is an interactive aircraft-tracking demo for public aircraft data across both countries. Built with Python, FastAPI, C++20 and Leaflet, it offers aircraft categories, airline filters, airport markers, illustrative routes and sample data for local testing.
+Tracjer is a small interactive aviation project with two practical views: an aircraft map for Sri Lanka and Canada, and **Cabin Crew Scenarios**, a short situational-judgment practice tool.
 
-## Features
-- Interactive Leaflet map with Canada and Sri Lanka region options.
-- Aircraft category and airline filters.
-- Airport markers and illustrative hub-to-hub route corridors.
-- FastAPI endpoints for aircraft, airlines, airports and corridors.
-- Optional C++20 geographic-distance module with a Python fallback.
-- Sample/demo data, pytest tests and GitHub Actions CI.
+The cabin crew module lets visitors work through everyday passenger-service situations and see feedback on communication, empathy, safety awareness and escalation. It is a learning demo—not an airline hiring test or a substitute for official cabin-crew training.
 
-## Quick start
+## Try the demo
+
+**Public demo:** once deployment finishes, use the live URL linked from this repository's About section. The public demo link will be added here when a successful deployment URL is confirmed.
+
+## What you can try
+
+- **Aircraft map:** explore regions, aircraft categories, airline filters, airport markers and illustrative route corridors.
+- **Cabin Crew Scenarios:** respond to a worried passenger during turbulence, a complaint about a delay, or a passenger who appears unwell.
+- **Feedback after each choice:** review the reasoning and a simple skills breakdown for empathy, clear communication, safety awareness and escalation.
+- **API:** FastAPI endpoints for aircraft, airlines, airports and corridors.
+- **Engineering:** Python, FastAPI, a small optional C++20 geographic-distance module, pytest tests and GitHub Actions CI.
+
+## Use it as a visitor
+
+1. Open the public demo link at the top of this README when it is available.
+2. Choose **Cabin Crew Scenarios** to practise a situation; no account is needed.
+3. Read the passenger situation and choose the response you would take.
+4. Review the feedback and skills breakdown, then try another scenario.
+5. Choose **Aircraft Map** to explore the map and its filters.
+
+The scenarios are fictional practice examples. Scores are explanatory feedback only; they do not predict recruitment outcomes or certify suitability for cabin-crew work.
+
+## Run locally
+
 Requirements: Python 3.10+ and pip. A C++ compiler and make are optional.
 
-```bash
-python -m pip install -r requirements.txt
-DEMO=1 python -m uvicorn backend.app.main:app --reload
-```
-Open http://127.0.0.1:8000. To run tests:
+    python -m pip install -r requirements.txt
+    DEMO=1 python -m uvicorn backend.app.main:app --reload
 
-```bash
-python -m pytest -q
-```
+Open http://127.0.0.1:8000. Run the automated tests with:
 
-Optional C++ module: run `make` with g++ 11+ and make installed.
+    python -m pytest -q
 
-## Live data and limitations
-Without `DEMO=1`, the app attempts to query the public adsb.lol community API and falls back to sample data if unavailable. Live data depends on external service availability and terms. Airport coordinates should be verified before use; route corridors are illustrative straight lines, not official airways. This is an educational demo, not an aviation safety or dispatch tool.
+Optional C++ module: run make with g++ 11+ and make installed.
 
-## Project structure
-- `backend/app/`: FastAPI endpoints and processing logic
-- `cpp/`: optional C++ geographic-distance implementation
-- `data/`: airport reference data and sample aircraft
-- `frontend/`: Leaflet interactive map
-- `tests/`: pytest tests
-- `.github/workflows/`: GitHub Actions CI
-- `docs/`: presentation and supporting notes
+## Data notes
+
+Without DEMO=1, the aircraft map attempts to query the public adsb.lol community API and falls back to sample data if unavailable. Live aircraft data depends on the external service and its terms. Airport coordinates should be verified before use; route corridors are illustrative straight lines, not official airways. The map is an educational demo, not an aviation safety or dispatch tool.
+
+## Project layout
+
+- backend/app/: FastAPI endpoints and processing logic
+- frontend/index.html: responsive map and cabin-crew scenario experience
+- cpp/: optional C++ geographic-distance implementation
+- data/: airport reference data and sample aircraft
+- tests/: pytest tests
+- .github/workflows/: GitHub Actions CI
+- render.yaml: Render web-service configuration
 
 ## License
-MIT. See `LICENSE`.
+
+MIT. See LICENSE.
