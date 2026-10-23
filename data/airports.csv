@@ -1,0 +1,21 @@
+iata,name,lat,lon
+YYZ,Toronto Pearson,43.677,-79.631
+YVR,Vancouver,49.195,-123.184
+YUL,Montreal Trudeau,45.470,-73.741
+YYC,Calgary,51.114,-114.020
+YEG,Edmonton,53.310,-113.580
+YOW,Ottawa,45.323,-75.669
+YWG,Winnipeg,49.910,-97.239
+YHZ,Halifax,44.881,-63.509
+YQB,Quebec City,46.789,-71.393
+YYT,St. John's,47.619,-52.752
+LHR,London Heathrow,51.470,-0.454
+JFK,New York JFK,40.640,-73.779
+CDG,Paris CDG,49.010,2.548
+DXB,Dubai,25.253,55.366
+HND,Tokyo Haneda,35.549,139.780
+SIN,Singapore Changi,1.364,103.992
+CMB,Colombo Bandaranaike,7.180,79.884
+RML,Colombo Ratmalana,6.820,79.886
+HRI,Mattala Rajapaksa,6.284,81.124
+JAF,Jaffna,9.792,80.070
