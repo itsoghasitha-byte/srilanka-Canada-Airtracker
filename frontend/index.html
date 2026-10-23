@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sri Lanka & Canada Tracker</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}html,body{height:100%;margin:0;font:14px system-ui,sans-serif;background:#0c1424;color:#f3f6fb}
+#bar{min-height:62px;padding:12px 16px;background:#111d31;border-bottom:1px solid #26354b;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+#bar b{font-size:16px;letter-spacing:.2px;margin-right:8px}select,button{background:#182943;color:#f3f6fb;border:1px solid #40516a;border-radius:8px;padding:8px 10px}
+#count{margin-left:auto;color:#b8c7dc}.sub{font-size:11px;color:#aab8cc;width:100%;margin-top:-5px}
+#map{height:calc(100% - 92px);min-height:300px}
+@media(max-width:600px){#bar{gap:7px;padding:10px}#bar b{width:100%}#count{margin-left:0}#map{height:calc(100% - 130px)}}
+</style>
+</head>
+<body>
+<div id="bar">
+ <b>✦ Sri Lanka & Canada Tracker</b>
+ <select id="region" aria-label="Tracking region"></select>
+ <select id="cat" aria-label="Aircraft category"><option value="all">All aircraft</option><option value="small">Small aircraft</option><option value="bizjet">Business jets</option><option value="other">Other aircraft</option></select>
+ <select id="airline" aria-label="Airline filter"><option value="">All airlines</option></select>
+ <span id="count">Loading aircraft…</span>
+ <div class="sub">Public aircraft data · Demo positions may be illustrative · Not for aviation operations</div>
+</div>
+<div id="map" role="application" aria-label="Interactive aircraft map"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const API = location.protocol === "file:" ? "http://localhost:8000" : "";
+const centers = {
+ toronto:[43.68,-79.63,6],vancouver:[49.19,-123.18,6],montreal:[45.47,-73.74,6],
+ calgary:[51.11,-114.02,6],winnipeg:[49.91,-97.24,6],halifax:[44.88,-63.51,6],colombo:[7.18,79.88,7]
+};
+const map = L.map("map").setView([52,-95],4);
+L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"&copy; OpenStreetMap contributors",maxZoom:19}).addTo(map);
+const planes=L.layerGroup().addTo(map), airports=L.layerGroup().addTo(map), routes=L.layerGroup().addTo(map);
+const colors={small:"#27ae60",bizjet:"#e65c5c",other:"#e2a83b"};
+const $=id=>document.getElementById(id);
+Object.keys(centers).forEach(r=>$("region").add(new Option(r[0].toUpperCase()+r.slice(1),r)));
+const get=async p=>{const r=await fetch(API+p);if(!r.ok)throw Error("Request failed: "+r.status);return r.json()};
+async function refresh(){
+ const region=$("region").value;
+ try{
+  const list=await get(`/api/aircraft?region=${region}&category=${$("cat").value}&airline=${$("airline").value}`);
+  planes.clearLayers();
+  list.forEach(a=>L.circleMarker([a.lat,a.lon],{radius:6,color:colors[a.category]||colors.other,fillOpacity:.8,weight:2})
+   .addTo(planes).bindPopup(`<b>${a.callsign||a.id||"Unknown aircraft"}</b><br>${a.airline?a.airline+"<br>":""}${a.type||"Unknown type"} · ${a.alt_ft} ft · ${a.speed_kt??"?"} kt`));
+  $("count").textContent=list.length+" aircraft";
+ }catch(e){$("count").textContent="Aircraft data unavailable";console.error(e)}
+}
+async function loadStaticLayers(){
+ try{const list=await get("/api/airports");list.forEach(a=>L.circleMarker([Number(a.lat),Number(a.lon)],{radius:3,color:"#70a5ff",fillOpacity:.85}).addTo(airports).bindTooltip(a.iata+" · "+a.name));}catch(e){console.warn(e)}
+ try{const list=await get("/api/corridors");list.forEach(c=>L.polyline(c.path,{color:"#8794aa",weight:1,dashArray:"5 6",opacity:.6}).addTo(routes).bindTooltip(c.from+" → "+c.to));}catch(e){console.warn(e)}
+ try{const obj=await get("/api/airlines");Object.entries(obj).forEach(([k,v])=>$("airline").add(new Option(v,k)));}catch(e){console.warn(e)}
+}
+function moveToRegion(){const c=centers[$("region").value];map.setView([c[0],c[1]],c[2]);refresh()}
+$("region").addEventListener("change",moveToRegion);
+$("cat").addEventListener("change",refresh);
+$("airline").addEventListener("change",refresh);
+loadStaticLayers();moveToRegion();setInterval(refresh,15000);
+</script>
+</body>
+</html>
