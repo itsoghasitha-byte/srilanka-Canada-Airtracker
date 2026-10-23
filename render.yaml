@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: tracjer
+    name: sri-lanka-canada-airtracker-cabin-crew-simulator
     runtime: python
     plan: free
     region: singapore
