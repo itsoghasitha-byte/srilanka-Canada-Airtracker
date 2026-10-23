@@ -74,3 +74,14 @@ Safety cards use larger, high-contrast imagery for at-a-glance viewing. If a rem
 
 ## Licensed media and full-frame viewing
 The six passenger-safety photos are embedded directly in the cards and do not navigate away when tapped or clicked. They use `object-fit: contain` so the complete photo is visible without cropping. Video cards retain source links to original Pexels clips. Pexels states its photos and videos are available for free use under the Pexels License; this is not a blanket clearance for separate rights in logos, brands, or identifiable people. If third-party media fails to load, original animated SVG illustrations provide a local fallback. Review the [Pexels License](https://www.pexels.com/license/) and the source page for each item before commercial reuse.
+
+
+## Vector tracking and exploration engine
+
+The repository now includes `exploration_engine.py`, a dependency-free Python reference module implementing vector tracking, angle-threshold turn/change detection, and 2D occupancy-grid raycasting, plus `tests/test_exploration_engine.py` covering normal cases and invalid inputs.
+
+- **Use case:** aircraft/map exploration; translate project measurements into 2D coordinates before interpreting the generic algorithm's results.
+- **Run tests:** `python -m pytest -q`.
+- **Scope:** this raycast is a generic grid primitive, not geographic collision avoidance, official aviation routing, medical advice, or real-world navigation.
+
+The existing GitHub repository and live-demo URLs remain unchanged. Python is the implemented reference engine. C++23 with Conan/vcpkg, Rust, PHP/Symfony/Mago, and Django are not represented as integrated runtimes in this change; they should be added only as tested adapters where the project's architecture benefits from them, rather than forcing every framework into every app.
