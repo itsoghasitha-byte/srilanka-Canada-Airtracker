@@ -1,4 +1,5 @@
 // C++20 geographic-distance kernel, called from Python through ctypes.
+#include <algorithm>
 #include <cmath>
 #include <numbers>
 extern "C" {
