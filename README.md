@@ -1,6 +1,6 @@
 # Sri Lanka & Canada Tracker
 
-Sri Lanka & Canada Tracker is an interactive aircraft-tracking demo that maps public aircraft data across both countries. Built with Python, FastAPI, C++20 and Leaflet, it includes aircraft categories, airline filters, airport markers and illustrative routes, with sample data available for local testing.
+Sri Lanka & Canada Tracker is an interactive aircraft-tracking demo for public aircraft data across both countries. Built with Python, FastAPI, C++20 and Leaflet, it offers aircraft categories, airline filters, airport markers, illustrative routes and sample data for local testing.
 
 ## Features
 - Interactive Leaflet map with Canada and Sri Lanka region options.
