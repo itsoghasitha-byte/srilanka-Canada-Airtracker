@@ -1,20 +1,27 @@
-# Sri Lanka & Canada Tracker
-Interactive aircraft map with a Python backend and optional C++ geographic kernel.
+# Sri Lanka and Canada Airtracker + Cabin Crew Simulator
 
-## Problem
-Public aircraft data is freely available but can be difficult to explore in one simple interface. This project demonstrates a cross-country map with aircraft filters.
+A compact aviation project with two visitor-facing features: an aircraft map focused on Sri Lanka and Canada, and an interactive cabin-crew situational-judgment simulator.
+
+## Visitor experience
+
+- Explore aircraft, region/category/airline filters, airport markers and illustrative route corridors.
+- Practise three fictional passenger-service situations.
+- Read immediate feedback about empathy, communication, safety awareness and escalation.
 
 ## Architecture
-- Data: adsb.lol community API
+
 - Backend: Python and FastAPI
-- C++20 kernel: batch great-circle distances, loaded through ctypes
-- Frontend: Leaflet map with periodic refresh
+- Frontend: HTML, CSS, JavaScript and Leaflet
+- Aircraft data: adsb.lol community API with demo/sample fallback
+- Optional C++20 geographic-distance module loaded through ctypes
 - Tests: pytest and GitHub Actions
 
 ## Engineering choices
-- Python fallback if the C++ library is not built
-- Demo mode and sample data if the API is unavailable
-- Filters for aircraft categories and supported airline callsigns
 
-## Next steps
-Validate airport data, improve map views for each region, add historical replay, and monitor API availability.
+- Demo mode allows the project to be explored without depending on live aircraft data.
+- The cabin crew simulator runs in the browser and does not require a login.
+- Scenario scores are for reflection only; this is not an official airline assessment or training resource.
+
+## Limitations
+
+Aircraft positions may be sample data if the external service is unavailable. Route corridors are illustrative rather than official airways. The project is not intended for operational aviation use.
