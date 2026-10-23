@@ -1,63 +1,40 @@
 <!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<title>Sri Lanka & Canada Tracker</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Tracjer: explore aircraft across Sri Lanka and Canada and practise cabin-crew passenger-service scenarios.">
+<title>Tracjer — Aviation Explorer & Cabin Crew Scenarios</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
-:root{color-scheme:dark}*{box-sizing:border-box}html,body{height:100%;margin:0;font:14px system-ui,sans-serif;background:#0c1424;color:#f3f6fb}
-#bar{min-height:62px;padding:12px 16px;background:#111d31;border-bottom:1px solid #26354b;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-#bar b{font-size:16px;letter-spacing:.2px;margin-right:8px}select,button{background:#182943;color:#f3f6fb;border:1px solid #40516a;border-radius:8px;padding:8px 10px}
-#count{margin-left:auto;color:#b8c7dc}.sub{font-size:11px;color:#aab8cc;width:100%;margin-top:-5px}
-#map{height:calc(100% - 92px);min-height:300px}
-@media(max-width:600px){#bar{gap:7px;padding:10px}#bar b{width:100%}#count{margin-left:0}#map{height:calc(100% - 130px)}}
-</style>
-</head>
-<body>
-<div id="bar">
- <b>✦ Sri Lanka & Canada Tracker</b>
- <select id="region" aria-label="Tracking region"></select>
- <select id="cat" aria-label="Aircraft category"><option value="all">All aircraft</option><option value="small">Small aircraft</option><option value="bizjet">Business jets</option><option value="other">Other aircraft</option></select>
- <select id="airline" aria-label="Airline filter"><option value="">All airlines</option></select>
- <span id="count">Loading aircraft…</span>
- <div class="sub">Public aircraft data · Demo positions may be illustrative · Not for aviation operations</div>
-</div>
-<div id="map" role="application" aria-label="Interactive aircraft map"></div>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-const API = location.protocol === "file:" ? "http://localhost:8000" : "";
-const centers = {
- toronto:[43.68,-79.63,6],vancouver:[49.19,-123.18,6],montreal:[45.47,-73.74,6],
- calgary:[51.11,-114.02,6],winnipeg:[49.91,-97.24,6],halifax:[44.88,-63.51,6],colombo:[7.18,79.88,7]
-};
-const map = L.map("map").setView([52,-95],4);
-L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"&copy; OpenStreetMap contributors",maxZoom:19}).addTo(map);
-const planes=L.layerGroup().addTo(map), airports=L.layerGroup().addTo(map), routes=L.layerGroup().addTo(map);
-const colors={small:"#27ae60",bizjet:"#e65c5c",other:"#e2a83b"};
-const $=id=>document.getElementById(id);
-Object.keys(centers).forEach(r=>$("region").add(new Option(r[0].toUpperCase()+r.slice(1),r)));
-const get=async p=>{const r=await fetch(API+p);if(!r.ok)throw Error("Request failed: "+r.status);return r.json()};
-async function refresh(){
- const region=$("region").value;
- try{
-  const list=await get(`/api/aircraft?region=${region}&category=${$("cat").value}&airline=${$("airline").value}`);
-  planes.clearLayers();
-  list.forEach(a=>L.circleMarker([a.lat,a.lon],{radius:6,color:colors[a.category]||colors.other,fillOpacity:.8,weight:2})
-   .addTo(planes).bindPopup(`<b>${a.callsign||a.id||"Unknown aircraft"}</b><br>${a.airline?a.airline+"<br>":""}${a.type||"Unknown type"} · ${a.alt_ft} ft · ${a.speed_kt??"?"} kt`));
-  $("count").textContent=list.length+" aircraft";
- }catch(e){$("count").textContent="Aircraft data unavailable";console.error(e)}
-}
-async function loadStaticLayers(){
- try{const list=await get("/api/airports");list.forEach(a=>L.circleMarker([Number(a.lat),Number(a.lon)],{radius:3,color:"#70a5ff",fillOpacity:.85}).addTo(airports).bindTooltip(a.iata+" · "+a.name));}catch(e){console.warn(e)}
- try{const list=await get("/api/corridors");list.forEach(c=>L.polyline(c.path,{color:"#8794aa",weight:1,dashArray:"5 6",opacity:.6}).addTo(routes).bindTooltip(c.from+" → "+c.to));}catch(e){console.warn(e)}
- try{const obj=await get("/api/airlines");Object.entries(obj).forEach(([k,v])=>$("airline").add(new Option(v,k)));}catch(e){console.warn(e)}
-}
-function moveToRegion(){const c=centers[$("region").value];map.setView([c[0],c[1]],c[2]);refresh()}
-$("region").addEventListener("change",moveToRegion);
-$("cat").addEventListener("change",refresh);
-$("airline").addEventListener("change",refresh);
-loadStaticLayers();moveToRegion();setInterval(refresh,15000);
-</script>
-</body>
-</html>
+:root{color-scheme:dark;--bg:#0b1220;--panel:#111d30;--line:#263750;--muted:#aab9ce;--text:#f3f6fb;--accent:#86b7ff;--green:#8ce0c0}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,sans-serif}button,select{font:inherit;background:#192a43;color:var(--text);border:1px solid #405573;border-radius:10px;padding:10px 12px;cursor:pointer}button:hover{border-color:var(--accent)}button:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}.top{padding:18px clamp(16px,4vw,48px);background:linear-gradient(115deg,#132540,#0d1728);border-bottom:1px solid var(--line)}.brand{display:flex;align-items:center;gap:12px}.mark{width:40px;height:40px;border:1px solid #4a6c94;border-radius:12px;display:grid;place-items:center;color:var(--accent);font-size:21px}.brand h1{font-size:24px;letter-spacing:.5px;margin:0}.brand p{margin:2px 0 0;color:var(--muted);font-size:13px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}.tab[aria-selected=true]{background:#dbeafe;color:#0b1728;border-color:#dbeafe;font-weight:650}.wrap{max-width:1200px;margin:auto;padding:22px clamp(12px,3vw,32px)}.intro{margin:0 0 18px;color:var(--muted)}.panel{border:1px solid var(--line);border-radius:16px;background:var(--panel);overflow:hidden}.toolbar{padding:12px;display:flex;align-items:center;gap:9px;flex-wrap:wrap;border-bottom:1px solid var(--line)}#count{margin-left:auto;color:var(--muted);font-size:13px}.sub{font-size:12px;color:var(--muted);width:100%}#map{height:min(68vh,680px);min-height:360px}.hidden{display:none!important}.scenario-layout{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(250px,.8fr);gap:16px}.scenario-card,.side-card{padding:clamp(16px,3vw,28px)}.eyebrow{font-size:12px;letter-spacing:1.2px;text-transform:uppercase;color:var(--accent);font-weight:700}.scenario-card h2{font-size:clamp(22px,3vw,30px);line-height:1.2;margin:8px 0 12px}.story{font-size:17px;color:#e2eaf5;margin:0 0 20px}.choices{display:grid;gap:10px}.choice{text-align:left;padding:14px;border-radius:12px;line-height:1.45;background:#16253a}.choice span{display:block;color:var(--muted);font-size:12px;margin-bottom:4px}.feedback{margin-top:16px;padding:16px;border:1px solid #355b58;border-radius:12px;background:#102b2a}.feedback h3{margin:0 0 6px;color:var(--green)}.feedback p{margin:6px 0}.scoregrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}.score{background:#17273d;border:1px solid var(--line);padding:12px;border-radius:10px}.score b{display:block;font-size:22px}.score small{color:var(--muted)}.side-card h3{margin-top:0}.side-card li{margin:8px 0;color:#d7e1ee}.secondary{margin-top:12px}.disclaimer{font-size:12px;color:var(--muted);margin-top:18px}.footer{border-top:1px solid var(--line);padding:18px clamp(16px,4vw,48px);color:var(--muted);font-size:12px}.leaflet-popup-content{color:#111}@media(max-width:760px){.scenario-layout{grid-template-columns:1fr}.brand h1{font-size:22px}#count{margin-left:0}#map{height:65vh;min-height:330px}}
+</style></head><body>
+<header class="top"><div class="brand"><div class="mark" aria-hidden="true">✦</div><div><h1>Tracjer</h1><p>Aviation explorer · Cabin crew scenario practice</p></div></div>
+<nav class="tabs" aria-label="Main sections"><button class="tab" id="mapTab" aria-selected="true">Aircraft Map</button><button class="tab" id="crewTab" aria-selected="false">Cabin Crew Scenarios</button></nav></header>
+<main class="wrap"><section id="mapView"><p class="intro">Explore aircraft data for selected regions in Sri Lanka and Canada. Positions may be illustrative when live data is unavailable.</p><div class="panel"><div class="toolbar"><select id="region" aria-label="Tracking region"></select><select id="cat" aria-label="Aircraft category"><option value="all">All aircraft</option><option value="small">Small aircraft</option><option value="bizjet">Business jets</option><option value="other">Other aircraft</option></select><select id="airline" aria-label="Airline filter"><option value="">All airlines</option></select><span id="count" aria-live="polite">Loading aircraft…</span><div class="sub">Public aircraft data · Routes are illustrative · Not for aviation operations</div></div><div id="map" role="application" aria-label="Interactive aircraft map"></div></div></section>
+<section id="crewView" class="hidden"><p class="intro">Short, fictional passenger-service situations. Choose a response and review the reasoning behind the feedback.</p><div class="scenario-layout"><div class="panel scenario-card"><div class="eyebrow" id="scenarioCount">Scenario 1 of 3</div><h2 id="scenarioTitle"></h2><p class="story" id="scenarioStory"></p><div class="choices" id="choices"></div><div id="feedback" class="feedback hidden" aria-live="polite"></div><button id="nextScenario" class="secondary hidden">Next scenario →</button><button id="restart" class="secondary hidden">Try again from the start</button></div><aside class="panel side-card"><h3>What this practice covers</h3><ul><li>Empathy and respectful passenger care</li><li>Clear, calm communication</li><li>Safety awareness and following procedures</li><li>Knowing when to involve the appropriate crew member</li></ul><div class="scoregrid"><div class="score"><b id="totalScore">—</b><small>Practice points</small></div><div class="score"><b id="doneCount">0/3</b><small>Scenarios completed</small></div></div><p class="disclaimer">This is an independent learning demo, not an airline assessment, official training material, or a prediction of hiring outcomes. In real situations, follow the airline's procedures and crew instructions.</p></aside></div></section></main><footer class="footer">Tracjer · Built with Python, FastAPI, JavaScript, Leaflet and an optional C++ distance module.</footer>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script><script>
+const API=location.protocol==="file:"?"http://localhost:8000":"";const $=id=>document.getElementById(id);
+$("mapTab").addEventListener("click",()=>showView("map"));$("crewTab").addEventListener("click",()=>showView("crew"));
+function showView(which){const crew=which==="crew";$("mapView").classList.toggle("hidden",crew);$("crewView").classList.toggle("hidden",!crew);$("mapTab").setAttribute("aria-selected",String(!crew));$("crewTab").setAttribute("aria-selected",String(crew));if(!crew)setTimeout(()=>map.invalidateSize(),50)}
+const centers={toronto:[43.68,-79.63,6],vancouver:[49.19,-123.18,6],montreal:[45.47,-73.74,6],calgary:[51.11,-114.02,6],winnipeg:[49.91,-97.24,6],halifax:[44.88,-63.51,6],colombo:[7.18,79.88,7]};
+const map=L.map("map").setView([52,-95],4);L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:"&copy; OpenStreetMap contributors",maxZoom:19}).addTo(map);const planes=L.layerGroup().addTo(map),airports=L.layerGroup().addTo(map),routes=L.layerGroup().addTo(map),colors={small:"#27ae60",bizjet:"#e65c5c",other:"#e2a83b"};
+Object.keys(centers).forEach(r=>$("region").add(new Option(r[0].toUpperCase()+r.slice(1),r)));const get=async p=>{const r=await fetch(API+p);if(!r.ok)throw Error("Request failed: "+r.status);return r.json()};
+async function refresh(){try{const list=await get("/api/aircraft?region="+$("region").value+"&category="+$("cat").value+"&airline="+$("airline").value);planes.clearLayers();list.forEach(a=>L.circleMarker([a.lat,a.lon],{radius:6,color:colors[a.category]||colors.other,fillOpacity:.8,weight:2}).addTo(planes).bindPopup("<b>"+(a.callsign||a.id||"Unknown aircraft")+"</b><br>"+(a.airline?a.airline+"<br>":"")+(a.type||"Unknown type")+" · "+a.alt_ft+" ft · "+(a.speed_kt??"?")+" kt"));$("count").textContent=list.length+" aircraft"}catch(e){$("count").textContent="Aircraft data unavailable";console.error(e)}}
+async function loadStaticLayers(){try{(await get("/api/airports")).forEach(a=>L.circleMarker([Number(a.lat),Number(a.lon)],{radius:3,color:"#70a5ff",fillOpacity:.85}).addTo(airports).bindTooltip(a.iata+" · "+a.name))}catch(e){console.warn(e)}try{(await get("/api/corridors")).forEach(c=>L.polyline(c.path,{color:"#8794aa",weight:1,dashArray:"5 6",opacity:.6}).addTo(routes).bindTooltip(c.from+" → "+c.to))}catch(e){console.warn(e)}try{Object.entries(await get("/api/airlines")).forEach(([k,v])=>$("airline").add(new Option(v,k)))}catch(e){console.warn(e)}}
+function moveToRegion(){const c=centers[$("region").value];map.setView([c[0],c[1]],c[2]);refresh()}$("region").addEventListener("change",moveToRegion);$("cat").addEventListener("change",refresh);$("airline").addEventListener("change",refresh);loadStaticLayers();moveToRegion();setInterval(refresh,15000);
+const scenarios=[
+{title:"A worried passenger during turbulence",story:"The seat-belt sign is on and the aircraft encounters turbulence. A passenger looks frightened and asks if the plane is in danger. What is your best first response?",choices:[
+{text:"Acknowledge their fear, speak calmly, and remind them to keep their seat belt fastened while following crew instructions.",scores:[3,3,3,2],why:"You acknowledge the passenger's concern without making promises, communicate calmly, and reinforce the immediate safety instruction."},
+{text:"Tell them there is absolutely nothing to worry about and promise the flight will be smooth soon.",scores:[1,1,1,0],why:"Reassurance should not include guarantees you cannot make. Keep safety instructions clear and avoid unsupported promises."},
+{text:"Ignore the question until the turbulence stops so you can avoid making them more anxious.",scores:[0,0,1,0],why:"When safe and permitted, a calm acknowledgement can help. Do not compromise your own safety or required procedures to respond."}]},
+{title:"A complaint about a delayed flight",story:"A passenger is upset about a delay, says they will miss a connection, and raises their voice at you. How do you respond?",choices:[
+{text:"Listen without interrupting, acknowledge the impact, explain only confirmed information, and direct them to the appropriate crew or ground team for next steps.",scores:[3,3,2,3],why:"This combines active listening with honest information and an appropriate handoff rather than inventing a solution."},
+{text:"Argue that the delay is not your fault and tell the passenger to calm down.",scores:[0,0,0,0],why:"Defensiveness can escalate tension and does not help the passenger understand available next steps."},
+{text:"Promise the airline will rebook them and pay for everything, even though you have not confirmed the policy.",scores:[1,1,0,1],why:"Do not promise outcomes or compensation outside your authority. Confirm facts and connect the passenger with the right team."}]},
+{title:"A passenger appears unwell",story:"During service, a passenger tells you they feel faint and look visibly unwell. What should you do first?",choices:[
+{text:"Take the concern seriously, promptly alert the appropriate crew member and follow onboard procedures; do not diagnose or delay escalation.",scores:[2,2,3,3],why:"Health concerns require prompt communication and established procedures. Avoid diagnosing or independently improvising medical care."},
+{text:"Offer a drink and continue service, checking back later if you have time.",scores:[1,1,0,0],why:"This may delay a response to a potentially serious issue. Notify the appropriate crew member promptly."},
+{text:"Tell them what condition you think they have and recommend a medicine.",scores:[0,0,0,0],why:"Guessing at a diagnosis or recommending medication is not appropriate. Escalate through the crew's procedures."}]}];
+let idx=0,total=0,done=0,answered=false;
+function renderScenario(){const s=scenarios[idx];answered=false;$("scenarioCount").textContent="Scenario "+(idx+1)+" of "+scenarios.length;$("scenarioTitle").textContent=s.title;$("scenarioStory").textContent=s.story;$("choices").innerHTML="";s.choices.forEach((c,i)=>{const b=document.createElement("button");b.className="choice";const label=document.createElement("span");label.textContent="Response "+String.fromCharCode(65+i);b.append(label,document.createTextNode(c.text));b.addEventListener("click",()=>answer(i));$("choices").append(b)});$("feedback").classList.add("hidden");$("nextScenario").classList.add("hidden");$("restart").classList.add("hidden");$("doneCount").textContent=done+"/"+scenarios.length;$("totalScore").textContent=done?total:"—"}
+function answer(n){if(answered)return;answered=true;const c=scenarios[idx].choices[n],points=c.scores.reduce((a,b)=>a+b,0);total+=points;done++;$("choices").querySelectorAll("button").forEach(b=>b.disabled=true);$("feedback").classList.remove("hidden");$("feedback").innerHTML="<h3>Feedback · "+points+"/11 points</h3><p>"+c.why+"</p><p><b>Reflection:</b> Consider how empathy, clear information, safety procedures and timely escalation work together.</p>";$("totalScore").textContent=total;$("doneCount").textContent=done+"/"+scenarios.length;if(idx<scenarios.length-1)$("nextScenario").classList.remove("hidden");else{$("restart").classList.remove("hidden");$("feedback").innerHTML+="<p><b>Session complete.</b> You earned "+total+" out of "+(scenarios.length*11)+" practice points. Review the reasoning above; this score is for reflection only.</p>"}}
+$("nextScenario").addEventListener("click",()=>{idx++;renderScenario()});$("restart").addEventListener("click",()=>{idx=0;total=0;done=0;renderScenario()});renderScenario();
+</script></body></html>
