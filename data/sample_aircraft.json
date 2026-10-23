@@ -1,0 +1,9 @@
+{"ac":[
+{"hex":"c0ffee","flight":"DEMO1  ","t":"C172","lat":43.9,"lon":-79.4,"alt_baro":2500,"gs":95},
+{"hex":"c0ffe1","flight":"DEMO2  ","t":"PC12","lat":44.3,"lon":-80.1,"alt_baro":14000,"gs":260},
+{"hex":"c0ffe2","flight":"DEMO3  ","t":"C56X","lat":43.2,"lon":-78.6,"alt_baro":38000,"gs":440},
+{"hex":"c0ffe3","flight":"DEMO4  ","t":"B738","lat":43.5,"lon":-79.9,"alt_baro":"ground","gs":0},
+{"hex":"c0ffe5","flight":"ACA123 ","t":"A321","lat":43.7,"lon":-79.2,"alt_baro":9000,"gs":320},
+{"hex":"c0ffe6","flight":"ALK455 ","t":"A332","lat":7.4,"lon":79.9,"alt_baro":12000,"gs":300},
+{"hex":"c0ffe7","flight":"EXV201 ","t":"A320","lat":7.0,"lon":80.0,"alt_baro":7000,"gs":260},
+{"hex":"c0ffe4","t":"GLF6","lat":null,"lon":null}]}
