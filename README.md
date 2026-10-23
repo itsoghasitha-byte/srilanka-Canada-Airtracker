@@ -48,3 +48,10 @@ The safety lab provides broad passenger-facing guidance, not confidential airlin
 
 ## License
 MIT. See `LICENSE`.
+
+## Royalty-free media and scroll video wall
+The Safety & Video Lab uses externally hosted stock photos and video previews from Pexels. The scroll video wall lazy-loads clips as they approach the viewport, starts them muted when visible (multiple visible clips may play together), and pauses clips after they leave the viewport. Tap/click a video to pause or resume it using the player controls. Autoplay may be restricted by browser settings, data saver, or iOS low-power mode; the Pexels source links remain available as fallbacks.
+
+Pexels states that its photos and videos are free to use under the Pexels License, without required attribution; the site still links back to each original clip. Rights to identifiable people, logos, and other depicted content may be separate, so review the source page and license before republishing or using footage in a commercial context. This project hotlinks source-hosted media rather than repackaging or redistributing the stock files. See the [Pexels License](https://www.pexels.com/license/) and [Pexels video library](https://www.pexels.com/videos/).
+
+The remote MP4 variants are best-effort previews; if a direct file URL changes or is unavailable, open the linked original Pexels clip. Browser autoplay requires muted video and does not guarantee playback on every device/network.
