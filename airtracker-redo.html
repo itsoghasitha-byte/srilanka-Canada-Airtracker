@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1, viewport-fit=cover'>
+<title>Sri Lanka and Canada Airtracker + Cabin Crew Simulator</title>
+<meta name='description' content='Aircraft map for Sri Lanka and Canada, a cabin crew simulator and a safety and video lab.'>
+<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css'>
+<style>
+:root{--ink:#f4f1ff;--mute:#c3badf;--g:#27d9a0;--p:#8a4dff;--glass:rgba(22,12,48,.66)}
+*{box-sizing:border-box;margin:0}
+html{-webkit-text-size-adjust:100%}
+body{min-height:100vh;color:var(--ink);font:16px/1.55 -apple-system,BlinkMacSystemFont,'SF Pro Text','Segoe UI',Roboto,sans-serif;background:#12062a;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);overflow-x:hidden}
+#bg{position:fixed;inset:0;width:100%;height:100%;z-index:-2;display:block}
+.vig{position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 50% 55%,transparent 50%,rgba(10,2,26,.6))}
+header{max-width:1200px;margin:auto;padding:22px 5vw 6px}
+h1{font-size:clamp(1.7rem,5vw,3rem);letter-spacing:-.02em;line-height:1.05;text-shadow:0 4px 24px rgba(0,0,0,.6)}
+.sub{color:var(--ink);opacity:.85;margin-top:6px}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+nav button{font:inherit;color:var(--ink);background:var(--glass);border:0;border-radius:999px;padding:9px 16px;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(255,255,255,.14);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+nav button[aria-selected=true]{background:linear-gradient(90deg,var(--g),var(--p));color:#10062a;font-weight:600}
+main{max-width:1200px;margin:auto;padding:14px 5vw 60px}
+.panel{background:var(--glass);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border-radius:22px;padding:18px;box-shadow:0 20px 50px -25px #000,inset 0 0 0 1px rgba(255,255,255,.1)}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.filters button,.btn{font:inherit;color:var(--ink);background:rgba(255,255,255,.1);border:0;border-radius:999px;padding:7px 14px;cursor:pointer}
+.filters button[aria-pressed=true]{background:var(--g);color:#10062a}
+#map{height:min(62vh,560px);border-radius:16px;overflow:hidden}
+.leaflet-tile-pane{filter:hue-rotate(255deg) saturate(.75) brightness(.85)}
+.ac{background:none;border:0;font-size:22px;line-height:1;text-shadow:0 0 8px #000}
+.note{color:var(--mute);font-size:.85rem;margin-top:10px}
+.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:10px;margin-top:12px}
+.list div{background:rgba(255,255,255,.07);border-radius:12px;padding:10px 12px;font-size:.9rem}
+.list b{display:block}
+h2{font-size:1.4rem;margin-bottom:6px}
+.opt{display:block;width:100%;text-align:left;font:inherit;color:var(--ink);background:rgba(255,255,255,.09);border:0;border-radius:14px;padding:12px 14px;margin-top:8px;cursor:pointer}
+.opt.ok{background:rgba(39,217,160,.3)}.opt.bad{background:rgba(255,92,120,.28)}
+#fb{margin-top:12px;color:var(--mute)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:16px;margin-top:14px}
+.post{background:var(--glass);border-radius:20px;overflow:hidden;box-shadow:0 20px 50px -25px #000,inset 0 0 0 1px rgba(255,255,255,.1);display:flex;flex-direction:column}
+.frame{position:relative;aspect-ratio:16/10;background:#06020f;overflow:hidden}
+.frame video,.frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;display:block}
+.badge{position:absolute;left:10px;bottom:10px;padding:4px 10px;border-radius:999px;background:rgba(10,4,24,.78);font-size:.78rem}
+.mute{position:absolute;right:10px;top:10px;padding:6px 12px;border:0;border-radius:999px;background:rgba(10,4,24,.78);color:var(--ink);font:inherit;font-size:.78rem;cursor:pointer}
+.tap{position:absolute;inset:0;display:none;align-items:center;justify-content:center;border:0;background:rgba(10,4,24,.45);color:#fff;font-size:3rem;cursor:pointer}
+.frame.blocked .tap{display:flex}
+.fail{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:20px;text-align:center;color:var(--mute)}
+.body{padding:12px 14px 14px}.body h3{font-size:1.05rem}.body p{color:var(--mute);font-size:.9rem}
+.credit{margin-top:6px;font-size:.78rem}.credit a{color:var(--g)}
+.tips{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:12px;margin:12px 0}
+.tips div{background:rgba(255,255,255,.07);border-radius:14px;padding:12px 14px}.tips b{color:var(--g)}
+footer{color:var(--mute);font-size:.82rem;text-align:center;padding:0 5vw 40px}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<canvas id='bg' aria-hidden='true'></canvas><div class='vig'></div>
+<header>
+  <h1>Sri Lanka and Canada Airtracker</h1>
+  <p class='sub'>Aircraft exploration, Cabin Crew Simulator and Safety and Video Lab</p>
+  <nav id='tabs'><button data-t='map'>Aircraft Map</button><button data-t='sim'>Cabin Crew Simulator</button><button data-t='lab'>Safety and Video Lab</button></nav>
+</header>
+<main>
+<section class='tab panel' id='map-s' data-id='map'>
+  <div class='filters' id='flt'><button data-r='all' aria-pressed='true'>All</button><button data-r='lk' aria-pressed='false'>Sri Lanka</button><button data-r='ca' aria-pressed='false'>Canada</button></div>
+  <div id='map'></div>
+  <p class='note'>Airports are real; aircraft positions and routes are sample and illustrative. Not for navigation or dispatch.</p>
+  <div class='list' id='aclist'></div>
+</section>
+<section class='tab panel' id='sim-s' data-id='sim' hidden>
+  <h2>Cabin Crew Simulator</h2>
+  <p class='note' id='sp'></p>
+  <h3 id='sq' style='margin-top:10px'></h3>
+  <div id='so'></div><p id='fb'></p>
+  <button class='btn' id='next' hidden>Next scenario</button> <button class='btn' id='again' hidden>Try again</button>
+  <p class='note'>Fictional practice scenarios. This is not official airline training or an assessment. Follow your airline procedures in real situations.</p>
+</section>
+<section class='tab' id='lab-s' data-id='lab' hidden>
+  <div class='panel'>
+    <h2>Safety and Video Lab</h2>
+    <p class='note' style='font-size:.95rem'>Clips autoplay muted and keep playing while you scroll. Each clip plays twice, rests for 2 minutes, then starts again. Tap a video to pause or resume it.</p>
+    <div class='tips'>
+      <div><b>Seat belt</b><br>Keep it low, snug and fastened whenever seated.</div>
+      <div><b>Exits</b><br>Find your nearest exits. One may be behind you.</div>
+      <div><b>Oxygen mask</b><br>Pull one toward you, cover nose and mouth, then help others.</div>
+      <div><b>Life vest</b><br>Read the safety card. Inflate only when crew instruct or after leaving the aircraft.</div>
+      <div><b>Turbulence</b><br>Return to your seat, buckle up and secure loose items.</div>
+      <div><b>Evacuation</b><br>Leave bags behind and follow crew commands.</div>
+    </div>
+    <p class='note'>General guidance only. Follow the aircraft safety card and the operating crew.</p>
+    <p style='margin-top:12px'><label class='btn' style='display:inline-block'>Preview your own video<input id='file' type='file' accept='video/*' hidden></label></p>
+  </div>
+  <div class='grid' id='grid'></div>
+</section>
+</main>
+<footer>Independent learning demo. Media from Wikimedia Commons under their licences. Map data &copy; OpenStreetMap contributors.</footer>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js'></script>
+<script>
+/* ---------- tabs ---------- */
+const sections=[...document.querySelectorAll('.tab')],tabBtns=[...document.querySelectorAll('#tabs button')];
+let map;
+function show(id){sections.forEach(s=>s.hidden=s.dataset.id!==id);tabBtns.forEach(b=>b.setAttribute('aria-selected',b.dataset.t===id));if(id==='map'&&map)setTimeout(()=>map.invalidateSize(),60);history.replaceState(null,'','#'+id)}
+tabBtns.forEach(b=>b.addEventListener('click',()=>show(b.dataset.t)));
+/* ---------- map ---------- */
+const AP=[['CMB','Colombo Bandaranaike',7.1808,79.8841,'lk'],['YYZ','Toronto Pearson',43.6777,-79.6248,'ca'],['YVR','Vancouver',49.1947,-123.1792,'ca'],['YUL','Montreal Trudeau',45.4706,-73.7408,'ca'],['YYC','Calgary',51.1139,-114.0203,'ca']];
+const AC=[['Sample A1','Boeing 777',7.6,79.2,300,'lk'],['Sample A2','Airbus A330',6.3,80.6,120,'lk'],['Sample B1','Boeing 737',44.2,-78.4,260,'ca'],['Sample B2','Airbus A320',49.8,-120.5,80,'ca'],['Sample B3','Boeing 787',45.9,-72.9,200,'ca']];
+if(window.L){
+ map=L.map('map',{worldCopyJump:true}).setView([28,-30],2);
+ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
+ const grp={lk:L.featureGroup().addTo(map),ca:L.featureGroup().addTo(map)};
+ AP.forEach(a=>L.circleMarker([a[2],a[3]],{radius:7,color:'#fff',weight:2,fillColor:'#27d9a0',fillOpacity:1}).bindPopup('<b>'+a[0]+'</b><br>'+a[1]).addTo(grp[a[4]]));
+ AC.forEach(a=>L.marker([a[3-1+0],a[3]],{icon:L.divIcon({className:'ac',html:'<span style=display:inline-block;transform:rotate('+(a[4]-45)+'deg)>&#9992;</span>',iconSize:[24,24]})}).bindPopup('<b>'+a[0]+'</b><br>'+a[1]+'<br>Sample position').addTo(grp[a[5]]));
+ L.polyline([[7.1808,79.8841],[43.6777,-79.6248]],{color:'#8a4dff',weight:2,dashArray:'6 8'}).bindTooltip('Illustrative route').addTo(map);
+ const fl=document.getElementById('flt');
+ fl.addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;[...fl.children].forEach(x=>x.setAttribute('aria-pressed',x===b));
+  const r=b.dataset.r;['lk','ca'].forEach(k=>{if(r==='all'||r===k)map.addLayer(grp[k]);else map.removeLayer(grp[k])});
+  const fg=L.featureGroup(r==='all'?[grp.lk,grp.ca]:[grp[r]]);map.fitBounds(fg.getBounds().pad(.3),{maxZoom:r==='lk'?7:5})});
+ map.fitBounds(L.featureGroup([grp.lk,grp.ca]).getBounds().pad(.2));
+}else document.getElementById('map').textContent='The map could not load. Check your connection.';
+document.getElementById('aclist').innerHTML=AC.map(a=>'<div><b>'+a[0]+'</b>'+a[1]+' &middot; sample data</div>').join('');
+/* ---------- simulator ---------- */
+const SC=[
+ {q:'A nervous first-time flyer grips the armrest during taxi. What do you do?',o:[['Check in calmly and explain the sounds they may hear.',1,'Calm reassurance and clear information help. Check back later too.'],['Tell them to relax because flying is safe.',0,'That can feel dismissive. Acknowledge the feeling first, then inform.'],['Ignore it so they are not embarrassed.',0,'A quiet check-in is usually kinder than ignoring visible distress.']]},
+ {q:'A passenger asks for help lifting a heavy bag into the overhead bin.',o:[['Help if safe, or ask a nearby crew member to assist, and keep the aisle clear.',1,'Helping safely and keeping aisles clear supports both comfort and safety.'],['Say it is not your job.',0,'Passenger care matters. If you cannot lift it safely, involve a colleague.'],['Let them block the aisle until they finish.',0,'Blocked aisles slow boarding and are a safety concern.']]},
+ {q:'A passenger says they feel unwell. What is the best first step?',o:[['Speak with them calmly, ask what they need and inform the senior crew member.',1,'Listen, assess calmly and involve the right crew member promptly.'],['Offer medicine from your own bag.',0,'Do not give personal medicine. Follow procedures and involve crew.'],['Wait to see if it passes.',0,'Waiting can delay help. Report concerns early.']]}
+];
+let si=0,score=0;
+const $=id=>document.getElementById(id);
+function scen(){const s=SC[si];$('sp').textContent='Scenario '+(si+1)+' of '+SC.length+' | Score '+score+'/'+SC.length;$('sq').textContent=s.q;$('fb').textContent='Choose an answer for feedback.';$('next').hidden=true;$('again').hidden=true;
+ const box=$('so');box.replaceChildren();
+ s.o.forEach(o=>{const b=document.createElement('button');b.className='opt';b.textContent=o[0];b.onclick=()=>{if(box.dataset.done==si)return;box.dataset.done=si;b.classList.add(o[1]?'ok':'bad');if(o[1])score++;$('fb').textContent=o[2];$('sp').textContent='Scenario '+(si+1)+' of '+SC.length+' | Score '+score+'/'+SC.length;if(si<SC.length-1)$('next').hidden=false;else{$('again').hidden=false;$('fb').textContent=o[2]+' Finished: '+score+' of '+SC.length+'.'}};box.appendChild(b)})}
+$('next').onclick=()=>{si++;scen()};$('again').onclick=()=>{si=0;score=0;$('so').dataset.done='';scen()};scen();
+/* ---------- video lab ---------- */
+const REST=120000,PLAYS=2,CM='https://commons.wikimedia.org/wiki/';
+const MEDIA=[
+ {type:'video',title:'Night landing at Kathmandu airport',caption:'A short night approach and landing clip.',src:[CM+'Special:FilePath/Kathmandu_airport_landing_night.webm'],page:CM+'File:Kathmandu_airport_landing_night.webm',credit:'Ventriloquist, CC BY-SA 4.0'},
+ {type:'video',title:'Plane passing a thunder cloud',caption:'An aircraft passing a storm cloud.',src:[CM+'Special:FilePath/PlanePassingThunderCloud.ogv'],page:CM+'File:PlanePassingThunderCloud.ogv',credit:'Docfirerock, CC BY-SA 4.0'},
+ {type:'photo',title:'Boeing BBJ 737-700',caption:'Full photo, nothing cropped.',src:CM+'Special:FilePath/Boeing_BBJ_737-700_N301SR_MD1.jpg?width=1280',page:CM+'File:Boeing_BBJ_737-700_N301SR_MD1.jpg',credit:'Acroterion, CC BY-SA 4.0'},
+ {type:'photo',title:'Boeing 737-900ER',caption:'Full photo, nothing cropped.',src:CM+'Special:FilePath/Plane,_Boeing_737_900_ER.jpg?width=1280',page:CM+'File:Plane,_Boeing_737_900_ER.jpg',credit:'Haaan22, CC BY-SA 4.0'},
+ {type:'photo',title:'Boeing 777',caption:'Full photo, nothing cropped.',src:CM+'Special:FilePath/Boeing_777.jpg?width=1280',page:CM+'File:Boeing_777.jpg',credit:'see the source page for credit and licence'}
+];
+const grid=$('grid'),ctl=[];
+const mime=u=>u.indexOf('.webm')>0?'video/webm':(u.indexOf('.ogv')>0||u.indexOf('.ogg')>0)?'video/ogg':'video/mp4';
+const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e};
+const fmt=ms=>{const s=Math.ceil(ms/1000);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+function fail(fr,msg){const f=el('div','fail');f.textContent=msg;fr.replaceChildren(f)}
+function addPost(m,idx){
+ const post=el('article','post'),fr=el('div','frame');
+ if(m.type==='photo'){const img=new Image();img.alt=m.title;img.decoding='async';img.loading=idx>2?'lazy':'eager';img.onerror=()=>fail(fr,'This photo could not load. Use the source link below.');img.src=m.src;fr.appendChild(img)}
+ else{
+  const v=document.createElement('video');v.muted=true;v.defaultMuted=true;v.playsInline=true;v.setAttribute('playsinline','');v.setAttribute('webkit-playsinline','');v.preload='auto';v.disablePictureInPicture=true;
+  m.src.forEach(u=>{const s=document.createElement('source');s.src=u;s.type=m.mime||mime(u);v.appendChild(s)});
+  v.lastChild.addEventListener('error',()=>fail(fr,'This clip cannot play in this browser. Use the source link below, or add an MP4 version.'));
+  const badge=el('div','badge','Starting'),tap=el('button','tap','&#9654;'),mute=el('button','mute','Sound off');tap.setAttribute('aria-label','Play video');
+  const st={v,plays:0,resting:false,user:false,left:0};
+  const label=()=>{badge.textContent=st.resting?'Resting '+fmt(st.left)+', then replays':(st.user?'Paused':'Playing '+Math.min(st.plays+1,PLAYS)+' of '+PLAYS)};
+  st.play=()=>{const p=v.play();if(p&&p.then)p.then(()=>{fr.classList.remove('blocked');label()}).catch(()=>fr.classList.add('blocked'))};
+  function rest(){st.resting=true;const end=Date.now()+REST;st.left=REST;label();const iv=setInterval(()=>{st.left=Math.max(0,end-Date.now());label();if(st.left<=0){clearInterval(iv);st.resting=false;st.plays=0;v.currentTime=0;st.play()}},1000)}
+  v.addEventListener('ended',()=>{st.plays++;if(st.plays<PLAYS){v.currentTime=0;st.play()}else rest();label()});
+  fr.addEventListener('click',e=>{if(e.target===mute||e.target===tap||st.resting)return;st.user=!st.user;if(st.user)v.pause();else st.play();label()});
+  tap.addEventListener('click',()=>{st.user=false;st.play()});
+  mute.addEventListener('click',()=>{v.muted=!v.muted;mute.textContent=v.muted?'Sound off':'Sound on'});
+  fr.append(v,badge,mute,tap);ctl.push(st);v.addEventListener('loadeddata',()=>{if(!st.user&&!st.resting)st.play()});st.play();
+ }
+ const body=el('div','body'),h=el('h3');h.textContent=m.title;const p=el('p');p.textContent=m.caption;
+ body.append(h,p,el('p','credit',(m.page?`<a href='${m.page}' target='_blank' rel='noopener'>Source and licence</a> &middot; `:'')+m.credit));
+ post.append(fr,body);grid.appendChild(post)}
+MEDIA.forEach(addPost);
+$('file').addEventListener('change',e=>{const f=e.target.files[0];if(!f)return;addPost({type:'video',title:f.name,caption:'Your video, previewed on this device only.',src:[URL.createObjectURL(f)],mime:f.type||'video/mp4',credit:'Your own file'},0)});
+const wake=()=>ctl.forEach(s=>{if(!s.resting&&!s.user&&s.v.paused&&!s.v.ended)s.play()});
+setInterval(()=>{if(!document.hidden)wake()},2500);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)wake()});
+['pointerdown','touchstart','keydown'].forEach(e=>addEventListener(e,wake,{passive:true}));
+show(['map','sim','lab'].includes(location.hash.slice(1))?location.hash.slice(1):'map');
+/* ---------- airport scene background ---------- */
+(function(){
+const cv=$('bg'),g=cv.getContext('2d'),reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+let W,H,hor,vx,S;
+function fit(){const d=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;g.setTransform(d,0,0,d,0,0);hor=H*.44;vx=W*.5;S=Math.min(W*.36,H*.5)}
+let sd=7;const rnd=()=>(sd=(sd*16807)%2147483647)/2147483647,hills=[];for(let i=0;i<48;i++)hills.push(.4+rnd()*.6);
+function mk(core,mid){const s=document.createElement('canvas');s.width=s.height=64;const x=s.getContext('2d'),r=x.createRadialGradient(32,32,0,32,32,32);r.addColorStop(0,core);r.addColorStop(.18,mid);r.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=r;x.fillRect(0,0,64,64);return s}
+const spW=mk('rgba(255,255,255,1)','rgba(255,240,200,.45)'),spB=mk('rgba(200,225,255,1)','rgba(80,150,255,.45)'),spY=mk('rgba(255,250,220,1)','rgba(255,205,110,.5)');
+const Y=d=>hor+(H-hor)/d,X=(x,d)=>vx+x*S/d;
+function quad(x1,x2,d1,d2,f){g.fillStyle=f;g.beginPath();g.moveTo(X(x1,d1),Y(d1));g.lineTo(X(x2,d1),Y(d1));g.lineTo(X(x2,d2),Y(d2));g.lineTo(X(x1,d2),Y(d2));g.closePath();g.fill()}
+const glow=(sp,x,y,r)=>g.drawImage(sp,x-r,y-r,r*2,r*2);
+function plane(x,y,u,flip,tail,a){g.save();g.translate(x,y);g.globalAlpha=Math.max(.35,a);if(flip)g.scale(-1,1);
+ g.fillStyle='rgba(0,0,0,.35)';g.beginPath();g.ellipse(0,0,u*.95,u*.05,0,0,6.283);g.fill();
+ g.strokeStyle='#150a30';g.lineWidth=Math.max(1,u*.025);g.beginPath();g.moveTo(.35*u,-.14*u);g.lineTo(.35*u,-.03*u);g.moveTo(-.2*u,-.14*u);g.lineTo(-.2*u,-.03*u);g.stroke();
+ const gb=g.createLinearGradient(0,-.42*u,0,-.14*u);gb.addColorStop(0,'#6a46ac');gb.addColorStop(1,'#1f1046');
+ g.fillStyle=gb;g.beginPath();g.ellipse(0,-.28*u,.95*u,.14*u,0,0,6.283);g.fill();
+ g.fillStyle=tail;g.beginPath();g.moveTo(-.8*u,-.3*u);g.lineTo(-.98*u,-.64*u);g.lineTo(-.82*u,-.64*u);g.lineTo(-.55*u,-.3*u);g.closePath();g.fill();
+ g.fillStyle='#2c1860';g.beginPath();g.moveTo(-.1*u,-.26*u);g.lineTo(-.42*u,-.17*u);g.lineTo(-.24*u,-.17*u);g.lineTo(.14*u,-.27*u);g.closePath();g.fill();
+ g.beginPath();g.ellipse(.06*u,-.15*u,.13*u,.05*u,0,0,6.283);g.fill();
+ g.strokeStyle='rgba(190,255,210,.75)';g.lineWidth=Math.max(1,u*.02);g.beginPath();g.ellipse(0,-.28*u,.95*u,.14*u,0,Math.PI*1.08,Math.PI*1.92);g.stroke();
+ g.fillStyle='rgba(255,236,170,.8)';for(let i=0;i<14;i++){g.beginPath();g.arc((-.68+i*.095)*u,-.31*u,Math.max(.6,u*.012),0,6.283);g.fill()}
+ g.restore()}
+const P=[[-9,17,0,'#27d9a0'],[-6.5,12,1,'#8a4dff'],[-8,8.5,0,'#ff5cc8'],[-5,5.8,1,'#27d9a0'],[-4.2,3.4,0,'#8a4dff']];
+function frame(t){const sx=W*.7,sy=hor-H*.1;
+ let s=g.createLinearGradient(0,0,0,hor);s.addColorStop(0,'#1a0734');s.addColorStop(.4,'#47207c');s.addColorStop(.75,'#2c8f78');s.addColorStop(1,'#b9ffb2');g.fillStyle=s;g.fillRect(0,0,W,hor+2);
+ let r=g.createRadialGradient(sx,sy,0,sx,sy,H*.55);r.addColorStop(0,'rgba(255,252,210,.95)');r.addColorStop(.06,'rgba(205,255,200,.6)');r.addColorStop(.3,'rgba(110,255,170,.15)');r.addColorStop(1,'rgba(110,255,170,0)');g.fillStyle=r;g.fillRect(0,0,W,hor+2);
+ const px=((t*.012)%(W+160))-80,py=hor*.38+Math.sin(t*.0005)*5;g.fillStyle='rgba(18,6,40,.6)';g.beginPath();g.ellipse(px,py,9,2.2,0,0,6.283);g.fill();g.fillRect(px-2,py-1,4,1.6);g.fillRect(px-11,py-4,3,4);
+ const hg=g.createLinearGradient(0,hor-60,0,hor);hg.addColorStop(0,'#1d1046');hg.addColorStop(1,'#0e4a3a');g.fillStyle=hg;g.beginPath();g.moveTo(0,hor);for(let i=0;i<hills.length;i++)g.lineTo(i*W/(hills.length-1),hor-hills[i]*H*.07);g.lineTo(W,hor);g.closePath();g.fill();
+ const gg=g.createLinearGradient(0,hor,0,H);gg.addColorStop(0,'#2a9a78');gg.addColorStop(.25,'#124a45');gg.addColorStop(1,'#140a2c');g.fillStyle=gg;g.fillRect(0,hor,W,H-hor);
+ quad(-1.6,-18,1,90,'rgba(70,45,130,.55)');quad(1,2.2,1,90,'rgba(40,170,120,.28)');quad(-1,1,1,90,'#1a1826');quad(-1,-.96,1,90,'rgba(255,255,255,.85)');quad(.96,1,1,90,'rgba(255,255,255,.85)');
+ quad(2.2,3.7,1,90,'#262238');quad(2.2,2.25,1,90,'rgba(255,205,90,.85)');quad(3.65,3.7,1,90,'rgba(255,205,90,.85)');
+ const b=reduce?0:t*.0018,p=b%2.4;for(let k=0;k<38;k++){let d1=k*2.4-p+1,d2=d1+1.2;if(d2<1)continue;d1=Math.max(d1,1);quad(-.025,.025,d1,d2,'rgba(255,255,255,.9)')}
+ for(const [x,d,f,c] of P)plane(X(x,d),Y(d),S*1.5/d,f,c,1.25-d/26);
+ g.globalCompositeOperation='lighter';const p2=b%2;
+ for(let k=0;k<44;k++){const d=1.6+k*2-p2;if(d<1.3)continue;const y=Y(d),z=Math.max(2,26/d);glow(spW,X(-1.07,d),y,z);glow(spW,X(1.07,d),y,z);glow(spB,X(2.17,d),y,z*.8);glow(spB,X(3.73,d),y,z*.8)}
+ const p3=b%5;for(let k=7;k>=0;k--){const d=1.8+k*5-p3;if(d<1.4)continue;const x=X(4.1,d),y=Y(d),h=1.15*S/d,lx=x-.4*S/d,ly=y-h-.05*S/d;
+  g.globalCompositeOperation='source-over';g.strokeStyle='#0c0820';g.lineWidth=Math.max(1,5/d);g.beginPath();g.moveTo(x,y);g.lineTo(x,y-h);g.lineTo(lx,ly);g.stroke();
+  g.globalCompositeOperation='lighter';glow(spY,lx,ly,Math.max(5,70/d));const rx=1.5*S/d;g.fillStyle='rgba(255,226,150,.16)';g.beginPath();g.ellipse(X(3.2,d),y,rx,rx*.14,0,0,6.283);g.fill()}
+ for(let i=0;i<12;i++){const a=-.15+i*.27+Math.sin(t*.00025+i*1.7)*.04,L=H*1.8,x1=sx+Math.cos(a)*L,y1=sy+Math.sin(a)*L,x2=sx+Math.cos(a+.05)*L,y2=sy+Math.sin(a+.05)*L;
+  const rg=g.createLinearGradient(sx,sy,x1,y1);rg.addColorStop(0,'rgba(255,255,210,.2)');rg.addColorStop(1,'rgba(255,255,210,0)');g.fillStyle=rg;g.beginPath();g.moveTo(sx,sy);g.lineTo(x1,y1);g.lineTo(x2,y2);g.closePath();g.fill()}
+ g.globalCompositeOperation='source-over'}
+function loop(t){if(!document.hidden)frame(t);requestAnimationFrame(loop)}
+addEventListener('resize',()=>{fit();frame(performance.now())});fit();frame(0);if(!reduce)requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
